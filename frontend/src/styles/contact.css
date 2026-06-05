@@ -1,0 +1,88 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.contact-page {
+  background: linear-gradient(135deg, #ffffff 0%, #f7f4ed 62%, #eee2ca 100%);
+  color: #171717;
+  font-family: "Poppins", sans-serif;
+  min-height: calc(100vh - 88px);
+  padding: clamp(36px, 5vw, 64px) 20px 92px;
+}
+
+.contact-page > div {
+  margin: 0 auto;
+  max-width: 720px;
+}
+
+.contact-page h3 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2.2rem, 4.5vw, 3.35rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.contact-page h3 span {
+  color: #b88a35;
+}
+
+.contact-intro {
+  color: #555;
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 auto 26px;
+  max-width: 620px;
+  text-align: center;
+}
+
+.contact-page form {
+  background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 16px 42px rgba(23, 23, 23, 0.08);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.contact-page .form-control {
+  border: 1px solid rgba(23, 23, 23, 0.14);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-top: 0;
+  padding: 11px 14px;
+}
+
+.contact-page textarea.form-control {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.contact-page .form-control:focus {
+  border-color: #b88a35;
+  box-shadow: 0 0 0 4px rgba(213, 170, 87, 0.22);
+}
+
+.contact-page .btn-primary {
+  border-radius: 8px;
+  font-weight: 800;
+  min-height: 48px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 575.98px) {
+  .contact-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .contact-page form {
+    padding: 18px;
+  }
+
+  .contact-page .btn-primary {
+    width: 100%;
+  }
+}

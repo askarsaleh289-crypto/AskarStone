@@ -1,0 +1,167 @@
+
+:root {
+  --gold: #c9a24d;
+  --gold-dark: #a8832b;
+  --black: #1a1a1a;
+  --gray: #666;
+  --bg: #f4f0e7;
+}
+
+
+body {
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+}
+
+
+h3 {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+h3::after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 3px;
+  margin: 12px auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+
+input.form-control {
+  max-width: 420px;
+  margin: 0 auto 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+input.form-control:focus {
+  border-color: var(--gold);
+  box-shadow: none;
+}
+
+.btn-outline-secondary,
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-danger {
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.card.text-center {
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+
+.admin-orders .order-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.admin-orders .order-card {
+  padding: 16px;
+  margin-bottom: 14px;
+  background: #fff;
+  border-left: 5px solid #ffc107;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.admin-orders .order-card.confirmed {
+  border-left-color: #28a745;
+}
+
+.admin-orders .order-card.cancelled,
+.admin-orders .order-card.expired {
+  border-left-color: #dc3545;
+}
+
+.admin-orders .order-card-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-orders .order-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.card .d-flex {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.btn-sm {
+  border-radius: 18px;
+  font-weight: 600;
+}
+
+
+.btn-success {
+  background: var(--gold);
+  border: none;
+}
+
+.btn-success:hover {
+  background: var(--gold-dark);
+}
+
+.order-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0,0,0,0.6);
+}
+
+.order-modal {
+  width: min(100%, 620px);
+  max-height: 88vh;
+  overflow: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+}
+
+
+.btn-secondary {
+  border-radius: 14px;
+}
+
+@media (max-width: 768px) {
+  input.form-control {
+    max-width: 100%;
+  }
+
+  .card .d-flex,
+  .admin-orders .order-card-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-orders .order-card-actions,
+  .admin-orders .order-card-actions .btn {
+    width: 100%;
+  }
+
+  .admin-orders .order-card-actions {
+    justify-content: stretch;
+  }
+}

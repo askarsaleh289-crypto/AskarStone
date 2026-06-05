@@ -1,0 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.about {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(246, 241, 230, 0.88)),
+    linear-gradient(90deg, #fff 0%, #f1eadc 100%);
+  color: #171717;
+  font-family: "Poppins", sans-serif;
+  min-height: calc(100vh - 88px);
+  padding: clamp(54px, 7vw, 92px) 20px;
+}
+
+.about-content {
+  margin: 0 auto;
+  max-width: 1120px;
+}
+
+.about h1 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2.45rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin: 0 0 20px;
+}
+
+.about h1 span {
+  color: #b88a35;
+}
+
+.about-intro {
+  color: #505050;
+  font-size: 1rem;
+  line-height: 1.85;
+  margin: 0 0 34px;
+  max-width: 780px;
+}
+
+.about-stats {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 0 42px;
+}
+
+.about-stats div,
+.about-sections div,
+.about-factory {
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 14px 36px rgba(23, 23, 23, 0.07);
+}
+
+.about-stats div {
+  padding: 20px;
+}
+
+.about-stats strong {
+  color: #171717;
+  display: block;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  line-height: 1.1;
+}
+
+.about-stats span {
+  color: #6a6258;
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-top: 7px;
+}
+
+.about-factory {
+  align-items: center;
+  display: grid;
+  gap: 26px;
+  grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
+  margin-bottom: 42px;
+  padding: 20px;
+}
+
+.about-factory-img img {
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  box-shadow: 0 18px 42px rgba(23, 23, 23, 0.16);
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.about-factory-text h4,
+.about-sections h4 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.about-factory-text p,
+.about-sections p {
+  color: #5d5d5d;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin: 0;
+}
+
+.about-sections {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.about-sections div {
+  padding: 22px;
+}
+
+@media (max-width: 900px) {
+  .about-stats,
+  .about-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .about-factory {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .about {
+    padding: 42px 16px;
+  }
+
+  .about-stats div,
+  .about-sections div,
+  .about-factory {
+    padding: 16px;
+  }
+}

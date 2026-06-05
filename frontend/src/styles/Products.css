@@ -1,0 +1,144 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.products-page {
+  background: linear-gradient(135deg, #ffffff 0%, #f7f4ed 58%, #eee2ca 100%);
+  color: #171717;
+  font-family: "Poppins", sans-serif;
+  min-height: calc(100vh - 88px);
+  padding: clamp(36px, 5vw, 64px) 20px clamp(58px, 7vw, 92px);
+}
+
+.products-page > div {
+  margin: 0 auto;
+  max-width: 1120px;
+}
+
+.products-page .d-flex.justify-content-between {
+  align-items: end !important;
+  gap: 18px;
+  margin-bottom: 26px !important;
+}
+
+.products-page h3 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2.2rem, 4.6vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.products-page h3 span {
+  color: #b88a35;
+}
+
+.products-page .form-control {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(23, 23, 23, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(23, 23, 23, 0.06);
+  font-size: 0.95rem;
+  height: 48px;
+  max-width: 380px;
+  padding: 0 14px;
+}
+
+.products-page .form-control:focus {
+  border-color: #b88a35;
+  box-shadow: 0 0 0 4px rgba(213, 170, 87, 0.22);
+}
+
+.products-page .row {
+  row-gap: 22px;
+}
+
+.products-page .admin-card {
+  background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 16px 42px rgba(23, 23, 23, 0.08);
+  cursor: default;
+  overflow: hidden;
+  transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.products-page .admin-card:hover {
+  box-shadow: 0 22px 54px rgba(23, 23, 23, 0.13);
+  transform: translateY(-4px);
+}
+
+.products-page .admin-card img {
+  aspect-ratio: 4 / 3;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+  width: 100%;
+}
+
+.products-page .admin-card:hover img {
+  transform: scale(1.035);
+}
+
+.products-page .card-body {
+  padding: 20px;
+}
+
+.products-page .card-title {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.products-page .card-text {
+  color: #606060;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.products-page .product-meta {
+  color: #7c7061;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.products-empty {
+  background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 16px 42px rgba(23, 23, 23, 0.08);
+  color: #5d5d5d;
+  line-height: 1.7;
+  padding: 24px;
+  text-align: center;
+}
+
+.products-page .btn-primary {
+  align-items: center;
+  border-radius: 8px;
+  display: inline-flex;
+  font-size: 0.86rem;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 8px 16px;
+}
+
+@media (max-width: 767.98px) {
+  .products-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .products-page .d-flex.justify-content-between {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+
+  .products-page .form-control {
+    max-width: none;
+    width: 100% !important;
+  }
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+    }
+
+    .invoice {
+      width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border: 1px solid #ddd;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 100px;
+      height: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #000;
+      color: #fff;
+      padding: 10px;
+    }
+
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .footer {
+      margin-top: 40px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .signature {
+      width: 180px;
+      height: auto;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="invoice">
+
+ 
+  <div class="header">
+    <div class="brand">
+      <img src="{{logo}}" class="logo" alt="Askar Stone Logo" />
+      <div>
+        <h2>Askar Stone</h2>
+        <p>Lebanon</p>
+      </div>
+    </div>
+
+    <div class="right">
+      <h2>INVOICE</h2>
+      <p><b>Invoice #:</b> {{invoice}}</p>
+      <p><b>Date:</b> {{date}}</p>
+    </div>
+  </div>
+
+
+  <p><b>Name:</b> {{name}}</p>
+  <p><b>Email:</b> {{email}}</p>
+  <p><b>Phone:</b> {{phone}}</p>
+  <p><b>Address:</b> {{address}}</p>
+
+ 
+  <table>
+    <tr>
+      <th>Product</th>
+      <th>Size</th>
+      <th>Qty</th>
+      <th>Price</th>
+      <th>Total</th>
+    </tr>
+    {{items}}
+  </table>
+
+  <h3 class="right">Grand Total: ${{total}}</h3>
+  <p class="right"><b>Estimated delivery:</b> 2–5 business days</p>
+
+
+  <div class="footer">
+    <div class="right">
+      <p><b>Authorized Signature</b></p>
+      <img src="{{signature}}" class="signature" alt="Signature" />
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

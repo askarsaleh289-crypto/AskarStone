@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.projects-page {
+  background: linear-gradient(135deg, #ffffff 0%, #f7f4ed 58%, #eee2ca 100%);
+  color: #171717;
+  font-family: "Poppins", sans-serif;
+  min-height: calc(100vh - 88px);
+  padding: clamp(36px, 5vw, 64px) 20px clamp(58px, 7vw, 92px);
+}
+
+.projects-page > h3,
+.projects-page > .row {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1120px;
+}
+
+.projects-page h3 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2.2rem, 4.6vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 26px;
+}
+
+.projects-page h3 span {
+  color: #b88a35;
+}
+
+.projects-page .row {
+  row-gap: 22px;
+}
+
+.projects-page .admin-card {
+  background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 16px 42px rgba(23, 23, 23, 0.08);
+  cursor: default;
+  height: 100%;
+  overflow: hidden;
+  transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.projects-page .admin-card:hover {
+  box-shadow: 0 22px 54px rgba(23, 23, 23, 0.13);
+  transform: translateY(-4px);
+}
+
+.projects-page .admin-card img {
+  aspect-ratio: 4 / 3;
+  cursor: zoom-in;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+  width: 100%;
+}
+
+.projects-page .admin-card:hover img {
+  transform: scale(1.035);
+}
+
+.projects-page .card-body {
+  padding: 20px;
+}
+
+.projects-page .card-body h5 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.projects-page .card-body p {
+  color: #606060;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.projects-empty {
+  background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 16px 42px rgba(23, 23, 23, 0.08);
+  color: #5d5d5d;
+  line-height: 1.7;
+  padding: 24px;
+  text-align: center;
+}
+
+.project-modal {
+  align-items: center;
+  background: rgba(23, 23, 23, 0.76);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 18px;
+  position: fixed;
+  z-index: 9999;
+}
+
+.project-modal-content {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.32);
+  max-height: min(88vh, 820px);
+  max-width: 980px;
+  overflow: auto;
+  padding: 24px;
+  position: relative;
+  width: min(100%, 980px);
+}
+
+.project-modal-content img {
+  background: #f7f4ed;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  max-height: 560px;
+  object-fit: contain;
+  width: 100%;
+}
+
+.project-modal-content h4 {
+  color: #171717;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  font-weight: 700;
+  margin: 0 44px 10px 0;
+}
+
+.project-modal-content p {
+  color: #555;
+  font-size: 0.96rem;
+  line-height: 1.75;
+  margin: 0;
+}
+
+.close-btn {
+  align-items: center;
+  background: #171717;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 800;
+  height: 36px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 36px;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  background: #b88a35;
+}
+
+@media (max-width: 767.98px) {
+  .projects-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .project-modal-content {
+    padding: 16px;
+  }
+}

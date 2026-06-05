@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+
+.login-page {
+  min-height: 100vh;
+  padding: 40px 20px 100px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f0e7 100%);
+  font-family: "Poppins", sans-serif;
+  color: #1a1a1a;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+
+.login-page .mx-auto {
+  background: #ffffff;
+  padding: 38px 42px;
+  margin-top: 80px;
+
+ 
+  max-width: 480px !important;
+  width: 80%;
+
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+  animation: fadeUp 0.8s ease both;
+}
+
+
+.login-page h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #1a1a1a;
+  margin-bottom: 28px;
+  text-align: center;
+  animation: fadeLeft 0.8s ease both;
+}
+
+.login-page h3 span {
+  color: #c9a24d;
+}
+
+
+.login-page form {
+  animation: fadeUp 1s ease both;
+}
+
+.login-page .form-control {
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 15px 16px;
+  font-size: 15px;
+  transition: 0.3s ease;
+}
+
+.login-page .form-control:focus {
+  border-color: #c9a24d;
+  box-shadow: none;
+}
+
+
+.login-page .btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #c9a24d, #a8832b);
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.login-page .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+
+.login-page a[href*="forgot"] {
+  font-size: 14px;
+  color: #c9a24d !important;
+  transition: 0.3s ease;
+}
+
+.login-page a[href*="forgot"]:hover {
+  color: #a8832b !important;
+  text-decoration: underline;
+}
+
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@media (max-width: 768px) {
+  .login-page .mx-auto {
+    margin-top: 50px;
+    padding: 26px;
+    max-width: 100% !important;
+  }
+
+  .login-page h3 {
+    font-size: 32px;
+  }
+}
