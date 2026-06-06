@@ -361,30 +361,49 @@ router.post("/google-callback", async (req, res) => {
       return res.status(500).json({ error: "Google OAuth not configured" });
     }
 
-    // Exchange code for tokens
+    // Exchange authorization code for tokens using form-encoded payload
+    const tokenParams = new URLSearchParams();
+    tokenParams.append("code", code);
+    tokenParams.append("client_id", clientId);
+    tokenParams.append("client_secret", clientSecret);
+    tokenParams.append("redirect_uri", redirectUri);
+    tokenParams.append("grant_type", "authorization_code");
+
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: "authorization_code",
-      }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: tokenParams.toString(),
     });
 
-    const tokenData = await response.json();
+    const tokenText = await response.text();
+    let tokenData;
+    try {
+      tokenData = JSON.parse(tokenText);
+    } catch {
+      tokenData = { raw: tokenText };
+    }
 
     if (!response.ok) {
-      console.error("Google token exchange error:", tokenData);
-      return res.status(401).json({ error: "Failed to exchange code for tokens" });
+      console.error("Google token exchange error:", response.status, tokenData);
+      return res.status(401).json({
+        error: "Failed to exchange code for tokens",
+        details: tokenData,
+      });
+    }
+
+    // Ensure the ID token is present for verification
+    const idToken = tokenData.id_token;
+    if (!idToken) {
+      console.error("Google token exchange response missing id_token:", tokenData);
+      return res.status(401).json({
+        error: "Failed to obtain ID token from Google",
+        details: tokenData,
+      });
     }
 
     // Verify ID token to get user info
-    const idToken = tokenData.id_token;
     const tokenInfoResponse = await fetch(
-      `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${idToken}`
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${encodeURIComponent(idToken)}`
     );
     const tokenInfo = await tokenInfoResponse.json();
 

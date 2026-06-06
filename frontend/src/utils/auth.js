@@ -56,16 +56,23 @@ export function continueWithGoogle(toast) {
     return;
   }
 
+  const redirectUri = `${window.location.origin}/auth/google-callback`;
+
   // Open Google Sign-In in a popup
   const width = 500;
   const height = 600;
   const left = window.screenX + (window.outerWidth - width) / 2;
   const top = window.screenY + (window.outerHeight - height) / 2;
 
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${encodeURIComponent(clientId)}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&response_type=code` +
+    `&scope=${encodeURIComponent("openid email profile")}` +
+    `&access_type=online`;
+
   window.open(
-    `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-      `${window.location.origin}/auth/google-callback`
-    )}&response_type=code&scope=openid email profile`,
+    authUrl,
     "google_signin",
     `width=${width},height=${height},left=${left},top=${top}`
   );
@@ -73,19 +80,34 @@ export function continueWithGoogle(toast) {
 
 export function handleGoogleCallback(code, toast) {
   if (!code) {
-    toast.error("No authorization code received from Google.");
-    return Promise.reject();
+    const error = new Error("No authorization code received from Google.");
+    toast.error(error.message);
+    return Promise.reject(error);
   }
 
-  // Exchange code for token on backend
-  return fetch(`${process.env.REACT_APP_API_URL}/auth/google-callback`, {
+  const apiUrl = process.env.REACT_APP_API_URL || "";
+  if (!apiUrl) {
+    const error = new Error("API URL is not configured for Google callback.");
+    toast.error(error.message);
+    return Promise.reject(error);
+  }
+
+  return fetch(`${apiUrl}/auth/google-callback`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) throw new Error(data.error);
-      return data;
-    });
+  }).then(async (res) => {
+    const payload = await res.json().catch(() => ({ error: "Invalid JSON response from server" }));
+    if (!res.ok) {
+      const message = payload.error || payload.message || "Google sign-in failed.";
+      throw new Error(message);
+    }
+    if (payload.error) {
+      throw new Error(payload.error);
+    }
+    if (!payload.token || !payload.user) {
+      throw new Error("Google sign-in did not return authentication data.");
+    }
+    return payload;
+  });
 }
