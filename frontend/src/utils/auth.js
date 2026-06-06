@@ -100,7 +100,9 @@ export function handleGoogleCallback(code, toast) {
     const payload = await res.json().catch(() => ({ error: "Invalid JSON response from server" }));
     if (!res.ok) {
       const message = payload.error || payload.message || "Google sign-in failed.";
-      throw new Error(message);
+      const err = new Error(message);
+      if (payload.details) err.details = payload.details;
+      throw err;
     }
     if (payload.error) {
       throw new Error(payload.error);

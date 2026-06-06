@@ -354,11 +354,11 @@ router.post("/google-callback", async (req, res) => {
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = `${getFrontendUrl(req)}/auth/google-callback`;
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI; // exact redirect URI configured in Google Cloud
 
-    if (!clientId || !clientSecret) {
-      console.error("Google OAuth credentials not configured");
-      return res.status(500).json({ error: "Google OAuth not configured" });
+    if (!clientId || !clientSecret || !redirectUri) {
+      console.error("Google OAuth credentials not configured: missing one of GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI");
+      return res.status(500).json({ error: "Google OAuth not configured on server. Ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REDIRECT_URI are set." });
     }
 
     // Exchange authorization code for tokens using form-encoded payload

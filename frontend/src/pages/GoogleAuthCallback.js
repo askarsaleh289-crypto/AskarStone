@@ -26,8 +26,9 @@ export default function GoogleAuthCallback() {
     }
 
     // Exchange code for token
-    handleGoogleCallback(code, toast)
-      .then((data) => {
+    (async () => {
+      try {
+        const data = await handleGoogleCallback(code, toast);
         if (data.token && data.user) {
           // Store token and user
           localStorage.setItem("token", data.token);
@@ -37,14 +38,18 @@ export default function GoogleAuthCallback() {
           toast.success(`Welcome, ${data.user.name}!`);
           // Redirect to home
           navigate("/");
+          return;
         }
-      })
-      .catch((err) => {
+        throw new Error("Google sign-in did not return token/user");
+      } catch (err) {
         console.error("Google callback error:", err);
-        toast.error(err.message || "Google sign-in failed. Please try again.");
+        const msg = err.message || "Google sign-in failed. Please try again.";
+        const details = err.details ? JSON.stringify(err.details) : null;
+        toast.error(details ? `${msg} (${details})` : msg);
         // Redirect back to login
         setTimeout(() => navigate("/login"), 2000);
-      });
+      }
+    })();
   }, [searchParams, navigate]);
 
   return (
