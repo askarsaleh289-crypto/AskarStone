@@ -5,34 +5,53 @@ dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendEmail = async (to, subject, html, attachments = [], text) => {
+const sendEmail = async (
+  to,
+  subject,
+  html = "",
+  attachments = [],
+  text
+) => {
   try {
     const formattedAttachments = (attachments || [])
       .map((a) => {
-        const data = a.content
-          ? (Buffer.isBuffer(a.content)
-              ? a.content.toString("base64")
-              : Buffer.from(String(a.content)).toString("base64"))
-          : undefined;
+        let data;
+
+        if (Buffer.isBuffer(a.content)) {
+          data = a.content.toString("base64");
+        } else if (typeof a.content === "string") {
+          data = Buffer.from(a.content).toString("base64");
+        }
+
+        if (!data) return null;
 
         return {
-          type: a.contentType || a.type || "application/octet-stream",
           filename: a.filename || a.name,
+          type: a.contentType || a.type || "application/octet-stream",
           data,
         };
       })
-      .filter(a => a.data);
+      .filter(Boolean);
+
+    const plainText =
+      text ||
+      (html
+        ? html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
+        : "");
 
     const response = await resend.emails.send({
       from: "Askar Stone <onboarding@resend.dev>",
-      to,
+      to: Array.isArray(to) ? to : [to],
       subject,
       html,
-      text: text || html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
-      attachments: formattedAttachments,
+      text: plainText,
+      attachments: formattedAttachments.length
+        ? formattedAttachments
+        : undefined,
     });
 
-    console.log("Email sent:", response.id);
+    console.log("Email sent:", response?.data?.id);
+
     return response;
   } catch (err) {
     console.error("Send email error:", err);

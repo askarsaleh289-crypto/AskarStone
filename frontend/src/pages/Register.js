@@ -14,7 +14,6 @@ export default function Register() {
 
   const navigate = useNavigate();
 
-  // 🔐 password strength
   const getPasswordStrength = (pass) => {
     if (pass.length < 6) return "weak";
     if (
@@ -33,7 +32,14 @@ export default function Register() {
   const submit = async (e) => {
     e.preventDefault();
 
-    // validation frontend
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanName || !cleanEmail || !password) {
+      toast.error("All fields are required");
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -44,20 +50,29 @@ export default function Register() {
       return;
     }
 
+    if (strength === "weak") {
+      toast.error("Password is too weak");
+      return;
+    }
+
     setLoading(true);
 
     try {
       await API.post("/auth/register", {
-        name,
-        email,
+        name: cleanName,
+        email: cleanEmail,
         password,
         confirmPassword,
       });
 
-      toast.success("Account created! Check your email to verify it.");
+      toast.success("Account created! Check your email.");
       navigate("/login");
     } catch (err) {
-      toast.error(err?.response?.data?.error || "Register failed");
+      toast.error(
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "Register failed"
+      );
     } finally {
       setLoading(false);
     }
@@ -77,7 +92,6 @@ export default function Register() {
     >
       <form onSubmit={submit} className="space-y-4">
 
-        {/* NAME */}
         <input
           placeholder="Full name"
           value={name}
@@ -86,7 +100,6 @@ export default function Register() {
           className="input"
         />
 
-        {/* EMAIL */}
         <input
           type="email"
           placeholder="Email"
@@ -96,7 +109,6 @@ export default function Register() {
           className="input"
         />
 
-        {/* PASSWORD */}
         <div>
           <input
             type="password"
@@ -122,7 +134,6 @@ export default function Register() {
           )}
         </div>
 
-        {/* CONFIRM PASSWORD */}
         <input
           type="password"
           placeholder="Confirm password"
@@ -132,7 +143,6 @@ export default function Register() {
           className="input"
         />
 
-        {/* BUTTON */}
         <button disabled={loading} className="btn">
           {loading ? "Creating account..." : "Create account"}
         </button>
