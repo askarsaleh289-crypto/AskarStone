@@ -1,11 +1,3 @@
-export function getGoogleClientId() {
-  return process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
-}
-
-export function getGoogleAuthUrl() {
-  return process.env.REACT_APP_GOOGLE_AUTH_URL || "";
-}
-
 export function readStoredUser() {
   const raw = localStorage.getItem("user");
   if (!raw) return null;
@@ -49,33 +41,15 @@ export function clearCart(user) {
 }
 
 export function continueWithGoogle(toast) {
-  const clientId = getGoogleClientId();
-
-  if (!clientId) {
-    toast.error("Google Sign-In is not configured. Please contact support.");
+  const apiUrl = process.env.REACT_APP_API_URL || "";
+  if (!apiUrl) {
+    const message = "API URL is not configured for Google callback.";
+    if (toast) toast.error(message);
+    console.error(message);
     return;
   }
 
-  const redirectUri = `${window.location.origin}/auth/google-callback`;
-
-  // Open Google Sign-In in a popup
-  const width = 500;
-  const height = 600;
-  const left = window.screenX + (window.outerWidth - width) / 2;
-  const top = window.screenY + (window.outerHeight - height) / 2;
-
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${encodeURIComponent(clientId)}` +
-    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-    `&response_type=code` +
-    `&scope=${encodeURIComponent("openid email profile")}` +
-    `&access_type=online`;
-
-  window.open(
-    authUrl,
-    "google_signin",
-    `width=${width},height=${height},left=${left},top=${top}`
-  );
+  window.location.assign(`${apiUrl}/auth/google`);
 }
 
 export function handleGoogleCallback(code, toast) {

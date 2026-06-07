@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../api";
 import AuthShell, { AuthLink } from "../components/AuthShell";
-import { getGoogleAuthUrl } from "../utils/auth";
+import { continueWithGoogle } from "../utils/auth";
 
 export default function VerifyEmail() {
   const { token } = useParams();
@@ -28,11 +28,6 @@ export default function VerifyEmail() {
       active = false;
     };
   }, [token]);
-
-  const continueWithGoogle = () => {
-    const googleAuthUrl = getGoogleAuthUrl();
-    if (googleAuthUrl) window.location.assign(googleAuthUrl);
-  };
 
   return (
     <AuthShell
