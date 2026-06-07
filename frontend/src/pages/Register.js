@@ -9,20 +9,55 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+
+  // 🔐 password strength
+  const getPasswordStrength = (pass) => {
+    if (pass.length < 6) return "weak";
+    if (
+      pass.length >= 8 &&
+      /[A-Z]/.test(pass) &&
+      /[0-9]/.test(pass) &&
+      /[!@#$%^&*]/.test(pass)
+    ) {
+      return "strong";
+    }
+    return "medium";
+  };
+
+  const strength = getPasswordStrength(password);
 
   const submit = async (e) => {
     e.preventDefault();
+
+    // validation frontend
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await API.post("/auth/register", { name, email, password });
-      toast.success("Account created. Check your email to verify it.");
+      await API.post("/auth/register", {
+        name,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      toast.success("Account created! Check your email to verify it.");
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      toast.error(err?.response?.data?.message || "Register failed");
+      toast.error(err?.response?.data?.error || "Register failed");
     } finally {
       setLoading(false);
     }
@@ -32,7 +67,7 @@ export default function Register() {
     <AuthShell
       eyebrow="Create account"
       title="Register"
-      subtitle="Save your cart, request custom material support, and follow orders from request to confirmation."
+      subtitle="Save your cart, track orders, and get full access."
       onGoogle={() => continueWithGoogle(toast)}
       footer={
         <>
@@ -40,52 +75,65 @@ export default function Register() {
         </>
       }
     >
-      <form className="space-y-4" onSubmit={submit}>
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-stone-700">
-            Full name
-          </label>
-          <input
-            className="h-12 w-full rounded-md border border-stone-300 bg-white px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stonebrand-gold focus:ring-4 focus:ring-stonebrand-amber/25"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
+      <form onSubmit={submit} className="space-y-4">
 
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-stone-700">
-            Email
-          </label>
-          <input
-            className="h-12 w-full rounded-md border border-stone-300 bg-white px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stonebrand-gold focus:ring-4 focus:ring-stonebrand-amber/25"
-            placeholder="you@example.com"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+        {/* NAME */}
+        <input
+          placeholder="Full name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="input"
+        />
 
+        {/* EMAIL */}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="input"
+        />
+
+        {/* PASSWORD */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-stone-700">
-            Password
-          </label>
           <input
-            className="h-12 w-full rounded-md border border-stone-300 bg-white px-4 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stonebrand-gold focus:ring-4 focus:ring-stonebrand-amber/25"
-            placeholder="Create a secure password"
             type="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="input"
           />
+
+          {password && (
+            <p
+              className={`text-sm mt-1 ${
+                strength === "strong"
+                  ? "text-green-600"
+                  : strength === "medium"
+                  ? "text-yellow-600"
+                  : "text-red-600"
+              }`}
+            >
+              Password strength: {strength}
+            </p>
+          )}
         </div>
 
-        <button
-          className="h-12 w-full rounded-md bg-stonebrand-charcoal px-4 text-sm font-semibold text-white transition hover:bg-stonebrand-gold focus:outline-none focus:ring-4 focus:ring-stonebrand-amber/30 disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={loading}
-        >
+        {/* CONFIRM PASSWORD */}
+        <input
+          type="password"
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          className="input"
+        />
+
+        {/* BUTTON */}
+        <button disabled={loading} className="btn">
           {loading ? "Creating account..." : "Create account"}
         </button>
       </form>
