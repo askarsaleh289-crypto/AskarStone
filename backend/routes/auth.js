@@ -461,8 +461,11 @@ router.post("/forgot-password", async (req, res) => {
       message: "If this email exists, you will receive a password reset link"
     });
   } catch (err) {
-    console.error("Forgot password error:", err);
-    res.status(500).json({ error: "Failed to process password reset request" });
+    console.error("Forgot password error:", err.message, err.stack);
+    res.status(500).json({ 
+      error: "Failed to process password reset request",
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
