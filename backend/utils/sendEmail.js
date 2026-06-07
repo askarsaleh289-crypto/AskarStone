@@ -40,17 +40,19 @@ const sendEmail = async (
         : "");
 
     const response = await resend.emails.send({
-      from: "Askar Stone <onboarding@resend.dev>",
-      to: Array.isArray(to) ? to : [to],
-      subject,
-      html,
-      text: plainText,
-      attachments: formattedAttachments.length
-        ? formattedAttachments
-        : undefined,
-    });
+  from: "Askar Stone <onboarding@resend.dev>",
+  to,
+  subject,
+  html,
+  text: plainText,
+  attachments: formattedAttachments.length
+    ? formattedAttachments
+    : undefined,
+});
 
-    console.log("Email sent:", response?.data?.id);
+console.log("RAW RESEND RESPONSE:", JSON.stringify(response, null, 2));
+
+return response;
 
     return response;
   } catch (err) {
