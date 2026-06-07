@@ -27,6 +27,99 @@ async function restoreOrderStock(conn, orderId) {
   }
 }
 
+async function sendOrderPlacedEmail(orderId) {
+  const [[order]] = await db.query(
+    "SELECT * FROM orders WHERE id = ?",
+    [orderId]
+  );
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  const [items] = await db.query(`
+    SELECT 
+      p.name AS product_name,
+      oi.quantity,
+      oi.size,
+      v.price
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.id
+    JOIN product_variants v ON oi.variant_id = v.id
+    WHERE oi.order_id = ?
+  `, [orderId]);
+
+  const itemsHtml = items.map(i => `
+    <tr>
+      <td style="padding:8px;">${i.product_name}</td>
+      <td style="padding:8px;">${i.size || "-"}</td>
+      <td style="padding:8px;text-align:right;">${i.quantity}</td>
+      <td style="padding:8px;text-align:right;">$${i.price}</td>
+      <td style="padding:8px;text-align:right;">$${(i.price * i.quantity).toFixed(2)}</td>
+    </tr>
+  `).join("");
+
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  const logoUrl = `${frontendUrl.replace(/\/+$/, "")}/logo192.png`;
+
+  const emailHtml = `
+    <div style="font-family:Arial, sans-serif;color:#222;">
+      <div style="max-width:720px;margin:0 auto;padding:20px;">
+        <div style="text-align:center;margin-bottom:24px;">
+          <img src="${logoUrl}" alt="Askar Stone" style="height:64px;object-fit:contain;" />
+          <h2 style="margin:12px 0 0 0;color:#1f1f1f">Order Received</h2>
+        </div>
+
+        <p>Hi ${order.customer_name},</p>
+        <p>Thank you for your order! We've received it and will begin processing right away.</p>
+
+        <div style="background:#f8f9fa;padding:16px;border-radius:6px;margin:16px 0;">
+          <p style="margin:0;font-weight:bold;margin-bottom:8px;">Order ID: #${order.id}</p>
+          <p style="margin:0;color:#666;font-size:14px;">Placed on: ${new Date(order.created_at).toLocaleDateString()}</p>
+        </div>
+
+        <h3 style="color:#1f1f1f;margin-top:20px;">Order Summary</h3>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;border:1px solid #e6e6e6;">
+          <thead>
+            <tr style="background:#f8f9fa;">
+              <th style="text-align:left;padding:8px;border-bottom:2px solid #e6e6e6;">Item</th>
+              <th style="text-align:left;padding:8px;border-bottom:2px solid #e6e6e6;">Size</th>
+              <th style="text-align:right;padding:8px;border-bottom:2px solid #e6e6e6;">Qty</th>
+              <th style="text-align:right;padding:8px;border-bottom:2px solid #e6e6e6;">Unit Price</th>
+              <th style="text-align:right;padding:8px;border-bottom:2px solid #e6e6e6;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+            <tr style="background:#f8f9fa;font-weight:bold;">
+              <td colspan="4" style="padding:8px;text-align:right;">Total:</td>
+              <td style="padding:8px;text-align:right;">$${order.total}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="background:#e8f4f8;padding:16px;border-radius:6px;margin:16px 0;border-left:4px solid #007bff;">
+          <p style="margin:0;font-weight:bold;color:#007bff;">⏱️ What's Next?</p>
+          <p style="margin:8px 0 0 0;color:#333;">An admin will review and confirm your order shortly. You'll receive an email with your invoice and tracking information once it's confirmed.</p>
+          <p style="margin:8px 0 0 0;color:#333;"><strong>Estimated delivery:</strong> ${DELIVERY_WINDOW}</p>
+        </div>
+
+        <p style="color:#666;font-size:14px;margin-top:16px;">If you have any questions, please reply to this email or contact us at sales@askarstone.com</p>
+
+        <div style="border-top:1px solid #e6e6e6;padding-top:16px;margin-top:24px;">
+          <p style="color:#888;font-size:12px;text-align:center;">Askar Stone • Quality Stone Materials</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  await sendEmail(
+    order.customer_email,
+    `Order Received - Askar Stone (Order #${order.id})`,
+    emailHtml
+  );
+}
+
 async function sendConfirmedOrderInvoice(orderId, transactionId) {
   const [[order]] = await db.query(
     "SELECT * FROM orders WHERE id = ?",
@@ -213,6 +306,15 @@ router.post("/", verifyToken, async (req, res) => {
     }
 
     await conn.commit();
+    
+    // Send order placed confirmation email
+    try {
+      await sendOrderPlacedEmail(orderId);
+    } catch (emailErr) {
+      console.error("Error sending order confirmation email:", emailErr);
+      // Don't fail the order creation if email fails
+    }
+    
     res.json({
       message: "Order request submitted. Waiting for admin confirmation.",
       orderId,
