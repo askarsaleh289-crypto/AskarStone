@@ -211,6 +211,37 @@
     top: 0;
   }
 
+  .Gold-navbar .navbar-toggler {
+    display: block;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  .Gold-navbar .navbar-toggler .navbar-toggler-icon {
+    transition: transform 0.25s ease, background-color 0.25s ease;
+  }
+
+  .Gold-navbar .navbar-toggler.open .navbar-toggler-icon {
+    transform: rotate(90deg);
+  }
+
+  .Gold-navbar .navbar-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 300ms ease-in-out, opacity 300ms ease-in-out;
+    opacity: 0;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .Gold-navbar .navbar-collapse.mobile-open {
+    max-height: 1000px; /* large enough to show content */
+    opacity: 1;
+  }
+
   .Gold-navbar .navbar-nav {
     width: 100%;
     gap: 6px;

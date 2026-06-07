@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { isAdminUser, readStoredUser } from "../utils/auth";
 import "../styles/Navbar.css";
 
 export default function Navbar({ user, setUser }) {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const storedUser = readStoredUser();
@@ -18,7 +19,11 @@ export default function Navbar({ user, setUser }) {
     localStorage.removeItem("user");
     setUser(null);
     navigate("/");
+    setMenuOpen(false);
   };
+
+  const toggleMenu = () => setMenuOpen((s) => !s);
+  const closeMenu = () => setMenuOpen(false);
 
   const isAdmin = user && isAdminUser(user);
   const isLoggedIn = !!user;
@@ -37,7 +42,23 @@ export default function Navbar({ user, setUser }) {
           Askar Stone
         </Link>
 
-        <div className="navbar-collapse" id="navbarNav">
+        <button
+          className={`navbar-toggler ${menuOpen ? 'open' : ''}`}
+          aria-controls="navbarNav"
+          aria-expanded={menuOpen}
+          aria-label="Toggle navigation"
+          onClick={toggleMenu}
+        >
+          <span className="navbar-toggler-icon" />
+        </button>
+
+        <div className={`navbar-collapse ${menuOpen ? 'mobile-open' : ''}`} id="navbarNav" onClick={(e) => {
+          // close when a link is clicked on small screens
+          if (menuOpen) {
+            const target = e.target.closest && e.target.closest('a');
+            if (target) closeMenu();
+          }
+        }}>
 
           {/* LEFT MENU */}
           <ul className="navbar-nav me-auto">
@@ -45,29 +66,29 @@ export default function Navbar({ user, setUser }) {
             {!isAdmin && (
               <>
                 <li className="nav-item">
-                  <NavLink to="/" className="nav-link">Home</NavLink>
+                  <NavLink to="/" className="nav-link" onClick={closeMenu}>Home</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/about" className="nav-link">About</NavLink>
+                  <NavLink to="/about" className="nav-link" onClick={closeMenu}>About</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/products" className="nav-link">Products</NavLink>
+                  <NavLink to="/products" className="nav-link" onClick={closeMenu}>Products</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/projects" className="nav-link">Projects</NavLink>
+                  <NavLink to="/projects" className="nav-link" onClick={closeMenu}>Projects</NavLink>
                 </li>
 
                 {isLoggedIn && (
                   <>
                     <li className="nav-item">
-                      <NavLink to="/cart" className="nav-link">Cart</NavLink>
+                      <NavLink to="/cart" className="nav-link" onClick={closeMenu}>Cart</NavLink>
                     </li>
 
                     <li className="nav-item">
-                      <NavLink to="/contact" className="nav-link">Contact</NavLink>
+                      <NavLink to="/contact" className="nav-link" onClick={closeMenu}>Contact</NavLink>
                     </li>
                   </>
                 )}
@@ -77,23 +98,23 @@ export default function Navbar({ user, setUser }) {
             {isAdmin && (
               <>
                 <li className="nav-item">
-                  <NavLink to="/admin" className="nav-link">Dashboard</NavLink>
+                  <NavLink to="/admin" className="nav-link" onClick={closeMenu}>Dashboard</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/admin/products" className="nav-link">Products</NavLink>
+                  <NavLink to="/admin/products" className="nav-link" onClick={closeMenu}>Products</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/admin/projects" className="nav-link">Projects</NavLink>
+                  <NavLink to="/admin/projects" className="nav-link" onClick={closeMenu}>Projects</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/admin/messages" className="nav-link">Messages</NavLink>
+                  <NavLink to="/admin/messages" className="nav-link" onClick={closeMenu}>Messages</NavLink>
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/admin/orders" className="nav-link">Orders</NavLink>
+                  <NavLink to="/admin/orders" className="nav-link" onClick={closeMenu}>Orders</NavLink>
                 </li>
               </>
             )}
@@ -117,13 +138,13 @@ export default function Navbar({ user, setUser }) {
             ) : (
               <>
                 <li className="nav-item me-2">
-                  <Link className="btn btn-outline-light" to="/login">
+                  <Link className="btn btn-outline-light" to="/login" onClick={closeMenu}>
                     Login
                   </Link>
                 </li>
 
                 <li className="nav-item">
-                  <Link className="btn btn-light" to="/register">
+                  <Link className="btn btn-light" to="/register" onClick={closeMenu}>
                     Register
                   </Link>
                 </li>

@@ -64,6 +64,10 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
 
   const templatePath = path.join(invoicesDir, "invoice.html");
   let html = fs.readFileSync(templatePath, "utf8");
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  const logoUrl = `${frontendUrl.replace(/\/+$/, "")}/assets/logo.png`;
+  const signatureUrl = `${frontendUrl.replace(/\/+$/, "")}/assets/signature.png`;
+
   html = html
     .replace(/{{invoice}}/g, "INV-" + order.id)
     .replace(/{{date}}/g, new Date().toLocaleDateString())
@@ -73,22 +77,59 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
     .replace(/{{address}}/g, order.customer_address)
     .replace(/{{total}}/g, order.total)
     .replace(/{{items}}/g, itemsHtml)
-    .replace(/{{logo}}/g, "http://localhost:5000/assets/logo.png")
-    .replace(/{{signature}}/g, "http://localhost:5000/assets/signature.png");
+    .replace(/{{logo}}/g, logoUrl)
+    .replace(/{{signature}}/g, signatureUrl);
 
   const pdfPath = path.join(invoicesDir, `invoice-${order.id}.pdf`);
   await generateInvoice(html, pdfPath);
 
+  const emailHtml = `
+    <div style="font-family:Arial, sans-serif;color:#222;">
+      <div style="max-width:720px;margin:0 auto;padding:20px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+          <img src="${logoUrl}" alt="Askar Stone" style="height:56px;object-fit:contain;border-radius:8px;" />
+          <div>
+            <h2 style="margin:0;color:#1f1f1f">Order Confirmed</h2>
+            <p style="margin:0;color:#555">Thank you for your purchase. Below are your order details.</p>
+          </div>
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e6e6e6">Item</th>
+              <th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e6e6e6">Size</th>
+              <th style="text-align:right;padding:8px 6px;border-bottom:1px solid #e6e6e6">Qty</th>
+              <th style="text-align:right;padding:8px 6px;border-bottom:1px solid #e6e6e6">Unit</th>
+              <th style="text-align:right;padding:8px 6px;border-bottom:1px solid #e6e6e6">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+
+        <p style="font-weight:700">Order total: $${order.total}</p>
+        <p style="margin:6px 0"><strong>Confirmation reference:</strong> ${transactionId}</p>
+        <p style="margin:6px 0"><strong>Estimated delivery:</strong> ${DELIVERY_WINDOW}</p>
+
+        <p style="color:#666">If you have any questions, reply to this email or contact our support team.</p>
+
+        <div style="margin-top:22px;display:flex;align-items:center;gap:12px">
+          <img src="${signatureUrl}" alt="Signature" style="height:48px;object-fit:contain;border-radius:6px;" />
+          <div style="font-size:14px;color:#333">
+            <div style="font-weight:700">Askar Stone</div>
+            <div style="color:#666">Quality Stone Materials • sales@askarstone.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
   await sendEmail(
     order.customer_email,
-    "Your order is confirmed - Askar Stone",
-    `
-      <h2>Your order has been confirmed</h2>
-      <p>Our team will now start preparing your stone order.</p>
-      <p><b>Confirmation reference:</b> ${transactionId}</p>
-      <p><b>Estimated delivery:</b> ${DELIVERY_WINDOW}</p>
-      <p>Your invoice is attached.</p>
-    `,
+    `Your order is confirmed - Askar Stone (INV-${order.id})`,
+    emailHtml,
     [
       {
         filename: `invoice-${order.id}.pdf`,
