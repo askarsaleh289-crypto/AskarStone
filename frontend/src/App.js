@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -20,7 +20,6 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import GoogleAuthCallback from "./pages/GoogleAuthCallback";
 
-// Admin
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminProjects from "./pages/admin/AdminProjects";
@@ -29,19 +28,21 @@ import AdminMessages from "./pages/admin/AdminMessages";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import { isAdminUser, readStoredUser } from "./utils/auth";
 
-
-// ===================== AUTH GUARD =====================
+// ================= AUTH GUARD =================
 function RequireAuth({ user, children }) {
   const storedUser = user || readStoredUser();
+
   if (!localStorage.getItem("token") || !storedUser) {
     return <Navigate to="/login" replace />;
   }
+
   return children;
 }
 
-// ===================== ADMIN GUARD =====================
+// ================= ADMIN GUARD =================
 function RequireAdmin({ user, children }) {
   const storedUser = user || readStoredUser();
 
@@ -51,20 +52,27 @@ function RequireAdmin({ user, children }) {
   return children;
 }
 
-
-// ===================== APP =====================
+// ================= APP =================
 export default function App() {
-  const [user, setUser] = useState(() => readStoredUser());
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ FIX: load user ONCE فقط
+  useEffect(() => {
+    const storedUser = readStoredUser();
+    setUser(storedUser);
+    setLoading(false);
+  }, []);
+
+  if (loading) return null; // أو loading spinner
 
   return (
     <BrowserRouter>
       <Navbar user={user} setUser={setUser} />
 
       <Routes>
-
-        {/* ================= HOME ================= */}
+        {/* HOME */}
         <Route path="/" element={<Home />} />
-
         <Route path="/about" element={<About />} />
         <Route path="/products" element={<Products />} />
 
@@ -115,7 +123,7 @@ export default function App() {
           }
         />
 
-        {/* ================= AUTH ================= */}
+        {/* AUTH */}
         <Route
           path="/login"
           element={
@@ -126,6 +134,7 @@ export default function App() {
             )
           }
         />
+
         <Route
           path="/register"
           element={
@@ -136,13 +145,13 @@ export default function App() {
             )
           }
         />
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/auth/google-callback" element={<GoogleAuthCallback />} />
 
-
-        {/* ================= ADMIN ================= */}
+        {/* ADMIN */}
         <Route
           path="/admin"
           element={
@@ -187,16 +196,11 @@ export default function App() {
             </RequireAdmin>
           }
         />
-
       </Routes>
 
       <Footer />
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        theme="light"
-      />
+      <ToastContainer position="top-right" autoClose={3000} theme="light" />
     </BrowserRouter>
   );
 }
