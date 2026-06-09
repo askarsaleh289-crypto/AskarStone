@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import API from "../api";
 import AuthShell, { AuthLink } from "../components/AuthShell";
 import { continueWithGoogle } from "../utils/auth";
 
 export default function VerifyEmail() {
-  const { token } = useParams();
+  const { token: pathToken } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = pathToken || searchParams.get("token") || "";
+  const email = searchParams.get("email") || "";
   const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("Verifying your email...");
 
   useEffect(() => {
     let active = true;
 
-    API.get(`/auth/verify-email/${token}`)
+    if (!token) {
+      setStatus("error");
+      setMessage("Invalid verification link.");
+      return undefined;
+    }
+
+    API.get(`/auth/verify-email/${encodeURIComponent(token)}`, {
+      params: email ? { email } : undefined,
+    })
       .then((res) => {
         if (!active) return;
         setStatus("success");
@@ -21,13 +32,13 @@ export default function VerifyEmail() {
       .catch((err) => {
         if (!active) return;
         setStatus("error");
-        setMessage(err?.response?.data?.message || "Invalid or expired verification link.");
+        setMessage(err?.response?.data?.message || err?.response?.data?.error || "Invalid or expired verification link.");
       });
 
     return () => {
       active = false;
     };
-  }, [token]);
+  }, [token, email]);
 
   return (
     <AuthShell

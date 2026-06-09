@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
 import AuthShell, { AuthLink } from "../components/AuthShell";
 import { continueWithGoogle } from "../utils/auth";
 
 export default function ResetPassword() {
-  const { token } = useParams();
+  const { token: pathToken } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = pathToken || searchParams.get("token") || "";
+  const email = searchParams.get("email") || "";
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,16 +18,23 @@ export default function ResetPassword() {
     e.preventDefault();
     setLoading(true);
 
+    if (!token) {
+      toast.error("Invalid reset link.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await API.post("/auth/reset-password", {
         token,
-        newPassword: password,
+        email,
+        password,
       });
       toast.success(res.data.message || "Password updated.");
       setTimeout(() => navigate("/login"), 1200);
     } catch (err) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Something went wrong");
+      toast.error(err?.response?.data?.message || err?.response?.data?.error || "Something went wrong");
     } finally {
       setLoading(false);
     }

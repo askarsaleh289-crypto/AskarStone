@@ -147,7 +147,11 @@ export default function App() {
         />
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/VerifyEmail" element={<VerifyEmail />} />
+        <Route path="/VerifyEmail/:token" element={<VerifyEmail />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/auth/google-callback" element={<GoogleAuthCallback />} />
 

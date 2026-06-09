@@ -185,7 +185,7 @@ router.post("/register", async (req, res) => {
       [name, email, hash, verifyToken, expiry]
     );
 
-    const verifyLink = `${getFrontendUrl(req)}/VerifyEmail?token=${verifyToken}&email=${encodeURIComponent(email)}`;
+    const verifyLink = `${getFrontendUrl(req)}/verify-email/${verifyToken}?email=${encodeURIComponent(email)}`;
 
     await sendEmail(
       email,
@@ -204,15 +204,28 @@ router.post("/register", async (req, res) => {
 });
 
 //
-// ===================== VERIFY EMAIL =====================
-//
-router.post("/verify-email", async (req, res) => {
+async function verifyEmailToken(req, res) {
   try {
-    const { token, email } = req.body;
+    const token = req.params.token || req.body.token || req.query.token;
+    const email = req.body.email || req.query.email;
+
+    if (!token) {
+      return res.status(400).json({ error: "Missing verification token" });
+    }
+
+    const query = email
+      ? {
+          sql: "SELECT * FROM users WHERE email = ? AND verify_token = ?",
+          values: [email, token],
+        }
+      : {
+          sql: "SELECT * FROM users WHERE verify_token = ?",
+          values: [token],
+        };
 
     const [rows] = await db.query(
-      "SELECT * FROM users WHERE email = ? AND verify_token = ?",
-      [email, token]
+      query.sql,
+      query.values
     );
 
     if (!rows.length)
@@ -251,7 +264,12 @@ router.post("/verify-email", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Verify failed" });
   }
-});
+}
+
+// ===================== VERIFY EMAIL =====================
+//
+router.get("/verify-email/:token", verifyEmailToken);
+router.post("/verify-email", verifyEmailToken);
 
 //
 // ===================== LOGIN =====================
@@ -321,7 +339,7 @@ router.post("/forgot-password", async (req, res) => {
       [tokenHash, expiry, user.id]
     );
 
-    const link = `${getFrontendUrl(req)}/reset-password?token=${resetToken}&email=${email}`;
+    const link = `${getFrontendUrl(req)}/reset-password/${resetToken}?email=${encodeURIComponent(email)}`;
 
     await sendEmail(
       email,
@@ -340,13 +358,36 @@ router.post("/forgot-password", async (req, res) => {
 //
 router.post("/reset-password", async (req, res) => {
   try {
-    const { token, email, password, confirmPassword } = req.body;
+    const { token, email, confirmPassword } = req.body;
+    const password = req.body.password || req.body.newPassword;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: "Missing token or password" });
+    }
+
+    if (confirmPassword && password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password too short" });
+    }
 
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
+    const query = email
+      ? {
+          sql: "SELECT * FROM users WHERE email = ? AND reset_token = ?",
+          values: [email, tokenHash],
+        }
+      : {
+          sql: "SELECT * FROM users WHERE reset_token = ?",
+          values: [tokenHash],
+        };
+
     const [rows] = await db.query(
-      "SELECT * FROM users WHERE email = ? AND reset_token = ?",
-      [email, tokenHash]
+      query.sql,
+      query.values
     );
 
     if (!rows.length)
@@ -398,7 +439,7 @@ router.post("/resend-verify", async (req, res) => {
       [verifyToken, expiry, user.id]
     );
 
-    const link = `${getFrontendUrl(req)}/verify-email?token=${verifyToken}&email=${encodeURIComponent(email)}`;
+    const link = `${getFrontendUrl(req)}/verify-email/${verifyToken}?email=${encodeURIComponent(email)}`;
 
     await sendEmail(
       email,
