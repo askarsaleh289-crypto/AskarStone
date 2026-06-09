@@ -321,7 +321,7 @@ router.post("/forgot-password", async (req, res) => {
       [tokenHash, expiry, user.id]
     );
 
-    const link = `${getFrontendUrl(req)}/ResetPassword?token=${resetToken}&email=${email}`;
+    const link = `${getFrontendUrl(req)}/reset-password?token=${resetToken}&email=${email}`;
 
     await sendEmail(
       email,
@@ -398,7 +398,7 @@ router.post("/resend-verify", async (req, res) => {
       [verifyToken, expiry, user.id]
     );
 
-    const link = `${getFrontendUrl(req)}/VerifyEmail?token=${verifyToken}&email=${encodeURIComponent(email)}`;
+    const link = `${getFrontendUrl(req)}/verify-email?token=${verifyToken}&email=${encodeURIComponent(email)}`;
 
     await sendEmail(
       email,
