@@ -25,3 +25,4 @@ const sendEmail = async (
     throw err;
   }
 };
+export default sendEmail
