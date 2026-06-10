@@ -6,7 +6,9 @@ import db from "../db.js";
 import { verifyToken, isAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
-
+const BASE_URL =
+  process.env.BACKEND_URL ||
+  "https://askarstone-production.up.railway.app";
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads", "products");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -35,7 +37,7 @@ router.get("/", async (req, res) => {
       p.variants = variants.map(v => ({
         ...v,
         imageUrl: v.image
-          ? `http://localhost:5000/uploads/products/${v.image}`
+          ? `${BASE_URL}/uploads/products/${v.image}`
           : null,
       }));
     }
@@ -68,7 +70,7 @@ router.get("/:id", async (req, res) => {
     product.variants = variants.map(v => ({
       ...v,
       imageUrl: v.image
-        ? `http://localhost:5000/uploads/products/${v.image}`
+        ? `${BASE_URL}/uploads/products/${v.image}`
         : null,
     }));
 

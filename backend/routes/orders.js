@@ -9,8 +9,7 @@ import sendEmail from "../utils/sendEmail.js";
 const router = express.Router();
 const DELIVERY_WINDOW = "2-5 business days after admin confirmation";
 const ASKAR_LOGO_PATH = "/images/WhatsApp Image 2026-06-07 at 3.45.29 AM.jpeg";
-const SIGNATURE_PATH = path.resolve(process.cwd(), "assets", "askar-signature.svg");
-
+const SIGNATURE_PATH = path.resolve(process.cwd(), "assets", "signature.png");
 function getFrontendPublicPath(assetPath) {
   return path.resolve(
     process.cwd(),
@@ -121,7 +120,7 @@ async function sendOrderPlacedEmail(orderId) {
 
         <div style="background:#e8f4f8;padding:16px;border-radius:6px;margin:16px 0;border-left:4px solid #007bff;">
           <p style="margin:0;font-weight:bold;color:#007bff;">⏱️ What's Next?</p>
-          <p style="margin:8px 0 0 0;color:#333;">An admin will review and confirm your order shortly. You'll receive an email with your invoice and tracking information once it's confirmed.</p>
+          <p style="margin:8px 0 0 0;color:#333;">An admin will review and confirm your order shortly.You'll receive an order confirmation email once it's confirmed.</p>
           <p style="margin:8px 0 0 0;color:#333;"><strong>Estimated delivery:</strong> ${DELIVERY_WINDOW}</p>
         </div>
 
@@ -181,10 +180,10 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
   const logoFilePath = getFrontendPublicPath(ASKAR_LOGO_PATH);
   const logoUrl = getFrontendAssetUrl(ASKAR_LOGO_PATH);
   const invoiceLogo = getImageDataUri(logoFilePath, "image/jpeg") || logoUrl;
-  const signatureSource =
-    getImageDataUri(SIGNATURE_PATH, "image/svg+xml") ||
-    getImageDataUri(path.resolve(process.cwd(), "assets", "signature.png"), "image/png");
-
+ const signatureSource = getImageDataUri(
+  SIGNATURE_PATH,
+  "image/png"
+);
   html = html
     .replace(/{{invoice}}/g, "INV-" + order.id)
     .replace(/{{date}}/g, new Date().toLocaleDateString())
@@ -243,11 +242,6 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
     </div>
   `;
 
-console.log("PDF EXISTS:", fs.existsSync(pdfPath));
-
-if (fs.existsSync(pdfPath)) {
-  console.log("PDF SIZE:", fs.statSync(pdfPath).size);
-}
 
 await sendEmail(
   order.customer_email,

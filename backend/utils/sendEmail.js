@@ -1,38 +1,10 @@
-import { Resend } from "resend";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const sendEmail = async (
   to,
   subject,
   html = "",
-  attachments = [],
   text
 ) => {
   try {
-    const formattedAttachments = (attachments || [])
-      .map((a) => {
-        let data;
-
-        if (Buffer.isBuffer(a.content)) {
-          data = a.content.toString("base64");
-        } else if (typeof a.content === "string") {
-          data = Buffer.from(a.content).toString("base64");
-        }
-
-        if (!data) return null;
-
-        return {
-          filename: a.filename || a.name,
-          type: a.contentType || a.type || "application/octet-stream",
-          data,
-        };
-      })
-      .filter(Boolean);
-
     const plainText =
       text ||
       (html
@@ -40,19 +12,12 @@ const sendEmail = async (
         : "");
 
     const response = await resend.emails.send({
-  from: "Askar Stone <onboarding@resend.dev>",
-  to,
-  subject,
-  html,
-  text: plainText,
-  attachments: formattedAttachments.length
-    ? formattedAttachments
-    : undefined,
-});
-
-console.log("RAW RESEND RESPONSE:", JSON.stringify(response, null, 2));
-
-return response;
+      from: "Askar Stone <onboarding@resend.dev>",
+      to,
+      subject,
+      html,
+      text: plainText,
+    });
 
     return response;
   } catch (err) {
@@ -60,5 +25,3 @@ return response;
     throw err;
   }
 };
-
-export default sendEmail;
