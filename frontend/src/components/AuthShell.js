@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 
+
 export default function AuthShell({
   eyebrow,
   title,
