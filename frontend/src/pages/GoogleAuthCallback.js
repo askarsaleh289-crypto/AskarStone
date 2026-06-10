@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { handleGoogleCallback } from "../utils/auth";
+import { getPostLoginPath, handleGoogleCallback } from "../utils/auth";
 
 export default function GoogleAuthCallback() {
   const navigate = useNavigate();
@@ -36,8 +36,7 @@ export default function GoogleAuthCallback() {
           localStorage.setItem("currentUser", JSON.stringify(data.user));
 
           toast.success(`Welcome, ${data.user.name}!`);
-          // Redirect to home
-          navigate("/");
+          navigate(getPostLoginPath(data.user));
           return;
         }
         throw new Error("Google sign-in did not return token/user");

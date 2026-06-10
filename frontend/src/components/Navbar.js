@@ -25,7 +25,7 @@ export default function Navbar({ user, setUser }) {
     <nav className="navbar navbar-expand-xl navbar-dark Gold-navbar">
       <div className="container">
 
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand" to={isAdmin ? "/admin" : "/"}>
           <img
             src="/images/60849bd0-ed72-47d7-a44d-68128c104534.png"
             alt="Askar Stone Logo"
@@ -45,22 +45,48 @@ export default function Navbar({ user, setUser }) {
 
           <ul className="navbar-nav me-auto">
 
-            <li className="nav-item">
-              <NavLink to="/" className="nav-link" onClick={closeMenu}>Home</NavLink>
-            </li>
+            {isAdmin ? (
+              <>
+                <li className="nav-item">
+                  <NavLink to="/admin" className="nav-link" onClick={closeMenu}>Dashboard</NavLink>
+                </li>
 
-            <li className="nav-item">
-              <NavLink to="/about" className="nav-link" onClick={closeMenu}>About</NavLink>
-            </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/products" className="nav-link" onClick={closeMenu}>Products</NavLink>
+                </li>
 
-            <li className="nav-item">
-              <NavLink to="/products" className="nav-link" onClick={closeMenu}>Products</NavLink>
-            </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/projects" className="nav-link" onClick={closeMenu}>Projects</NavLink>
+                </li>
 
-            {isLoggedIn && (
-              <li className="nav-item">
-                <NavLink to="/cart" className="nav-link" onClick={closeMenu}>Cart</NavLink>
-              </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/orders" className="nav-link" onClick={closeMenu}>Orders</NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/admin/messages" className="nav-link" onClick={closeMenu}>Messages</NavLink>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <NavLink to="/" className="nav-link" onClick={closeMenu}>Home</NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/about" className="nav-link" onClick={closeMenu}>About</NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/products" className="nav-link" onClick={closeMenu}>Products</NavLink>
+                </li>
+
+                {isLoggedIn && (
+                  <li className="nav-item">
+                    <NavLink to="/cart" className="nav-link" onClick={closeMenu}>Cart</NavLink>
+                  </li>
+                )}
+              </>
             )}
           </ul>
 

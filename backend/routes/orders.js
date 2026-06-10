@@ -8,6 +8,28 @@ import sendEmail from "../utils/sendEmail.js";
 
 const router = express.Router();
 const DELIVERY_WINDOW = "2-5 business days after admin confirmation";
+const ASKAR_LOGO_PATH = "/images/WhatsApp Image 2026-06-07 at 3.45.29 AM.jpeg";
+const SIGNATURE_PATH = path.resolve(process.cwd(), "assets", "askar-signature.svg");
+
+function getFrontendPublicPath(assetPath) {
+  return path.resolve(
+    process.cwd(),
+    "..",
+    "frontend",
+    "public",
+    assetPath.replace(/^\/+/, "")
+  );
+}
+
+function getImageDataUri(filePath, mimeType) {
+  if (!fs.existsSync(filePath)) return null;
+  return `data:${mimeType};base64,${fs.readFileSync(filePath).toString("base64")}`;
+}
+
+function getFrontendAssetUrl(assetPath) {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  return encodeURI(`${frontendUrl.replace(/\/+$/, "")}/${assetPath.replace(/^\/+/, "")}`);
+}
 
 async function restoreOrderStock(conn, orderId) {
   const [items] = await conn.query(
@@ -59,8 +81,7 @@ async function sendOrderPlacedEmail(orderId) {
     </tr>
   `).join("");
 
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-  const logoUrl = `${frontendUrl.replace(/\/+$/, "")}/logo192.png`;
+  const logoUrl = getFrontendAssetUrl(ASKAR_LOGO_PATH);
 
   const emailHtml = `
     <div style="font-family:Arial, sans-serif;color:#222;">
@@ -157,9 +178,12 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
 
   const templatePath = path.join(invoicesDir, "invoice.html");
   let html = fs.readFileSync(templatePath, "utf8");
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-  const logoUrl = `${frontendUrl.replace(/\/+$/, "")}/assets/logo.png`;
-  const signatureUrl = `${frontendUrl.replace(/\/+$/, "")}/assets/signature.png`;
+  const logoFilePath = getFrontendPublicPath(ASKAR_LOGO_PATH);
+  const logoUrl = getFrontendAssetUrl(ASKAR_LOGO_PATH);
+  const invoiceLogo = getImageDataUri(logoFilePath, "image/jpeg") || logoUrl;
+  const signatureSource =
+    getImageDataUri(SIGNATURE_PATH, "image/svg+xml") ||
+    getImageDataUri(path.resolve(process.cwd(), "assets", "signature.png"), "image/png");
 
   html = html
     .replace(/{{invoice}}/g, "INV-" + order.id)
@@ -170,8 +194,8 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
     .replace(/{{address}}/g, order.customer_address)
     .replace(/{{total}}/g, order.total)
     .replace(/{{items}}/g, itemsHtml)
-    .replace(/{{logo}}/g, logoUrl)
-    .replace(/{{signature}}/g, signatureUrl);
+    .replace(/{{logo}}/g, invoiceLogo)
+    .replace(/{{signature}}/g, signatureSource || "");
 
   const pdfPath = path.join(invoicesDir, `invoice-${order.id}.pdf`);
   await generateInvoice(html, pdfPath);
@@ -209,7 +233,7 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
         <p style="color:#666">If you have any questions, reply to this email or contact our support team.</p>
 
         <div style="margin-top:22px;display:flex;align-items:center;gap:12px">
-          <img src="${signatureUrl}" alt="Signature" style="height:48px;object-fit:contain;border-radius:6px;" />
+          ${signatureSource ? `<img src="${signatureSource}" alt="Signature" style="height:48px;object-fit:contain;border-radius:6px;" />` : ""}
           <div style="font-size:14px;color:#333">
             <div style="font-weight:700">Askar Stone</div>
             <div style="color:#666">Quality Stone Materials • sales@askarstone.com</div>

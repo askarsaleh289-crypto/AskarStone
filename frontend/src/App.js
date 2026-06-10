@@ -29,7 +29,7 @@ import AdminMessages from "./pages/admin/AdminMessages";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { isAdminUser, readStoredUser } from "./utils/auth";
+import { getPostLoginPath, isAdminUser, readStoredUser } from "./utils/auth";
 
 // ================= AUTH GUARD =================
 function RequireAuth({ user, children }) {
@@ -52,6 +52,15 @@ function RequireAdmin({ user, children }) {
   return children;
 }
 
+function RedirectAuthenticatedUser({ user }) {
+  return <Navigate to={getPostLoginPath(user || readStoredUser())} replace />;
+}
+
+function HomeRoute({ user }) {
+  const storedUser = user || readStoredUser();
+  return isAdminUser(storedUser) ? <Navigate to="/admin" replace /> : <Home />;
+}
+
 // ================= APP =================
 export default function App() {
   const [user, setUser] = useState(null);
@@ -72,7 +81,7 @@ export default function App() {
 
       <Routes>
         {/* HOME */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomeRoute user={user} />} />
         <Route path="/about" element={<About />} />
         <Route path="/products" element={<Products />} />
 
@@ -128,7 +137,7 @@ export default function App() {
           path="/login"
           element={
             localStorage.getItem("token") ? (
-              <Navigate to="/" replace />
+              <RedirectAuthenticatedUser user={user} />
             ) : (
               <Login setUser={setUser} />
             )
@@ -139,7 +148,7 @@ export default function App() {
           path="/register"
           element={
             localStorage.getItem("token") ? (
-              <Navigate to="/" replace />
+              <RedirectAuthenticatedUser user={user} />
             ) : (
               <Register />
             )

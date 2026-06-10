@@ -16,6 +16,10 @@ export function isAdminUser(user) {
   return user?.is_admin === true || user?.is_admin === 1 || user?.is_admin === "1";
 }
 
+export function getPostLoginPath(user = readStoredUser()) {
+  return isAdminUser(user) ? "/admin" : "/";
+}
+
 export function getCartKey(user = readStoredUser()) {
   if (!user) return "cart_guest";
   const stableId = user.id || user.email || user.name || "guest";

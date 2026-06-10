@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from "../api";
 import AuthShell, { AuthLink } from "../components/AuthShell";
-import { continueWithGoogle, getCartKey } from "../utils/auth";
+import { continueWithGoogle, getCartKey, getPostLoginPath } from "../utils/auth";
 
 export default function Login({ setUser }) {
   const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ export default function Login({ setUser }) {
       if (setUser) setUser(user);
 
       toast.success(`Welcome back, ${user.name}`);
-      navigate("/");
+      navigate(getPostLoginPath(user));
     } catch (err) {
       console.error(err);
       toast.error(err?.response?.data?.message || "Login failed");

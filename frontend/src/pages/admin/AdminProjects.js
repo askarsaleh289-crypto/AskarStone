@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import API, { assetUrl } from "../../api";
+import { confirmWithToast } from "../../utils/confirmToast";
 import "../../styles/admin-projects.css";
 
 export default function AdminProjects() {
@@ -48,16 +49,20 @@ export default function AdminProjects() {
   };
 
   const deleteProject = async (id) => {
-    if (!window.confirm("Delete project?")) return;
-
-    try {
-      await API.delete(`/projects/${id}`);
-      toast.success("Project deleted.");
-      fetchProjects();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete project.");
-    }
+    confirmWithToast({
+      message: "Delete this project?",
+      confirmLabel: "Delete",
+      onConfirm: async () => {
+        try {
+          await API.delete(`/projects/${id}`);
+          toast.success("Project deleted.");
+          fetchProjects();
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to delete project.");
+        }
+      },
+    });
   };
 
   return (

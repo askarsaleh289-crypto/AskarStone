@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import API from "../../api";
+import { confirmWithToast } from "../../utils/confirmToast";
 import "../../styles/admin-products.css";
 
 export default function AdminProducts() {
@@ -108,16 +109,20 @@ export default function AdminProducts() {
   };
 
   const deleteProduct = async (id) => {
-    if (!window.confirm("Delete product?")) return;
-
-    try {
-      await API.delete(`/products/${id}`);
-      toast.success("Product deleted.");
-      fetchProducts();
-    } catch (err) {
-      console.error("Delete product error:", err);
-      toast.error("Failed to delete product.");
-    }
+    confirmWithToast({
+      message: "Delete this product?",
+      confirmLabel: "Delete",
+      onConfirm: async () => {
+        try {
+          await API.delete(`/products/${id}`);
+          toast.success("Product deleted.");
+          fetchProducts();
+        } catch (err) {
+          console.error("Delete product error:", err);
+          toast.error("Failed to delete product.");
+        }
+      },
+    });
   };
 
   return (

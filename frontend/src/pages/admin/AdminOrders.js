@@ -1,7 +1,33 @@
 import React, { useEffect, useState } from "react";
 import API, { assetUrl } from "../../api";
 import { toast } from "react-toastify";
+import { confirmWithToast } from "../../utils/confirmToast";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
 import "../../styles/admin-orders.css";
+
+ChartJS.register(
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 const STATUS_META = {
   pending: { label: "PENDING", color: "warning" },
@@ -39,39 +65,54 @@ export default function AdminOrders() {
     (order.items || []).reduce((sum, it) => sum + Number(it.quantity || 0), 0);
 
   const deleteOrder = async (id) => {
-    if (!window.confirm("Delete this order?")) return;
-    try {
-      await API.delete(`/orders/${id}`);
-      toast.success("Order deleted.");
-      fetchOrders();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete order.");
-    }
+    confirmWithToast({
+      message: "Delete this order?",
+      confirmLabel: "Delete",
+      onConfirm: async () => {
+        try {
+          await API.delete(`/orders/${id}`);
+          toast.success("Order deleted.");
+          fetchOrders();
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to delete order.");
+        }
+      },
+    });
   };
 
   const confirmOrder = async (id) => {
-    if (!window.confirm("Confirm this order and start preparing it?")) return;
-    try {
-      await API.post(`/orders/${id}/confirm`);
-      toast.success("Order confirmed.");
-      fetchOrders();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to confirm order.");
-    }
+    confirmWithToast({
+      message: "Confirm this order and send the invoice email?",
+      confirmLabel: "Confirm",
+      onConfirm: async () => {
+        try {
+          await API.post(`/orders/${id}/confirm`);
+          toast.success("Order confirmed and invoice email sent.");
+          fetchOrders();
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to confirm order.");
+        }
+      },
+    });
   };
 
   const cancelOrder = async (id) => {
-    if (!window.confirm("Cancel this request and restore stock?")) return;
-    try {
-      await API.post(`/orders/${id}/cancel`);
-      toast.success("Order cancelled.");
-      fetchOrders();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to cancel order.");
-    }
+    confirmWithToast({
+      message: "Cancel this request and restore stock?",
+      confirmLabel: "Cancel order",
+      onConfirm: async () => {
+        try {
+          await API.post(`/orders/${id}/cancel`);
+          toast.success("Order cancelled.");
+          fetchOrders();
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to cancel order.");
+        }
+      },
+    });
   };
 
   const downloadInvoice = (id) => {
@@ -112,6 +153,80 @@ export default function AdminOrders() {
     .filter(o => normalizeStatus(o.status) === "confirmed")
     .reduce((s, o) => s + Number(o.total || 0), 0);
 
+  const lastSevenDays = Array.from({ length: 7 }, (_, index) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - index));
+    return d;
+  });
+
+  const dayLabels = lastSevenDays.map((d) =>
+    d.toLocaleDateString(undefined, { month: "short", day: "numeric" })
+  );
+
+  const orderTrendData = lastSevenDays.map((d) => {
+    const key = d.toISOString().slice(0, 10);
+    return orders.filter((o) => o.created_at?.startsWith(key)).length;
+  });
+
+  const revenueTrendData = lastSevenDays.map((d) => {
+    const key = d.toISOString().slice(0, 10);
+    return orders
+      .filter((o) => o.created_at?.startsWith(key) && normalizeStatus(o.status) === "confirmed")
+      .reduce((sum, o) => sum + Number(o.total || 0), 0);
+  });
+
+  const statusChartData = {
+    labels: ["Pending", "Confirmed", "Cancelled / Expired"],
+    datasets: [
+      {
+        data: [pendingOrders, confirmedOrders, cancelledOrders],
+        backgroundColor: ["#c9a24d", "#2f9e44", "#d9480f"],
+        borderColor: "#ffffff",
+        borderWidth: 3,
+      },
+    ],
+  };
+
+  const orderTrendChartData = {
+    labels: dayLabels,
+    datasets: [
+      {
+        label: "Orders",
+        data: orderTrendData,
+        backgroundColor: "rgba(201, 162, 77, 0.72)",
+        borderColor: "#c9a24d",
+        borderWidth: 1,
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const revenueTrendChartData = {
+    labels: dayLabels,
+    datasets: [
+      {
+        label: "Confirmed Revenue",
+        data: revenueTrendData,
+        borderColor: "#1a1a1a",
+        backgroundColor: "rgba(26, 26, 26, 0.12)",
+        pointBackgroundColor: "#c9a24d",
+        pointBorderColor: "#1a1a1a",
+        tension: 0.35,
+        fill: true,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+    },
+  };
+
   const filtered = orders
     .filter(o => {
       const status = normalizeStatus(o.status);
@@ -145,13 +260,38 @@ export default function AdminOrders() {
         </button>
 
         {showStats && (
-          <div className="row mb-4">
-            <StatCard title="Pending" value={pendingOrders} color="warning" />
-            <StatCard title="Confirmed" value={confirmedOrders} color="success" />
-            <StatCard title="Cancelled" value={cancelledOrders} color="danger" />
-            <StatCard title="Revenue Today" value={`$${revenueToday}`} color="success" />
-            <StatCard title="Revenue This Week" value={`$${revenueThisWeek}`} color="dark" />
-            <StatCard title="Total Revenue" value={`$${totalRevenue}`} color="primary" />
+          <div className="admin-chart-section mb-4">
+            <div className="row mb-3">
+              <StatCard title="Pending" value={pendingOrders} color="warning" />
+              <StatCard title="Confirmed" value={confirmedOrders} color="success" />
+              <StatCard title="Cancelled" value={cancelledOrders} color="danger" />
+              <StatCard title="Revenue Today" value={`$${revenueToday}`} color="success" />
+              <StatCard title="Revenue This Week" value={`$${revenueThisWeek}`} color="dark" />
+              <StatCard title="Total Revenue" value={`$${totalRevenue}`} color="primary" />
+            </div>
+
+            <div className="admin-chart-grid">
+              <section className="admin-chart-panel">
+                <h5>Order Status</h5>
+                <div className="admin-chart-box">
+                  <Doughnut data={statusChartData} options={chartOptions} />
+                </div>
+              </section>
+
+              <section className="admin-chart-panel">
+                <h5>Orders Last 7 Days</h5>
+                <div className="admin-chart-box">
+                  <Bar data={orderTrendChartData} options={chartOptions} />
+                </div>
+              </section>
+
+              <section className="admin-chart-panel admin-chart-panel-wide">
+                <h5>Confirmed Revenue Last 7 Days</h5>
+                <div className="admin-chart-box">
+                  <Line data={revenueTrendChartData} options={chartOptions} />
+                </div>
+              </section>
+            </div>
           </div>
         )}
 
