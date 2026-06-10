@@ -243,19 +243,17 @@ async function sendConfirmedOrderInvoice(orderId, transactionId) {
     </div>
   `;
 
-  await sendEmail(
-    order.customer_email,
-    `Your order is confirmed - Askar Stone (INV-${order.id})`,
-    emailHtml,
-    [
-      {
-        filename: `invoice-${order.id}.pdf`,
-        content: fs.readFileSync(pdfPath),
-        contentType: "application/pdf"
-      }
-    ]
-  );
+console.log("PDF EXISTS:", fs.existsSync(pdfPath));
+
+if (fs.existsSync(pdfPath)) {
+  console.log("PDF SIZE:", fs.statSync(pdfPath).size);
 }
+
+await sendEmail(
+  order.customer_email,
+  `Your order is confirmed - Askar Stone (INV-${order.id})`,
+  emailHtml
+);}
 
 router.post("/", verifyToken, async (req, res) => {
   const conn = await db.getConnection();
